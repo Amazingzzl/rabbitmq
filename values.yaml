@@ -236,7 +236,7 @@ clustering:
 loadDefinition:
   ## @param loadDefinition.enabled Enable loading a RabbitMQ definitions file to configure RabbitMQ
   ##
-  enabled: false
+  enabled: true
   ## @param loadDefinition.file Name of the definitions file
   ##
   file: "/app/load_definition.json"
@@ -495,7 +495,33 @@ extraVolumes: []
 ##         ...
 ##       }
 ##
-extraSecrets: {}
+extraSecrets: 
+  load-definition:
+    load_definition.json: |
+      {
+        "vhosts": [
+          {
+            "name": "/"
+          }
+        ],
+        "policies": [
+          {
+            "name": "ha-all",
+            "pattern": ".*\..*",
+            "vhost": "/",
+            "definition": {
+              "ha-mode": "all"
+            }
+          }
+        ],
+        "users":[
+            {
+                "name": "admin",
+                "password": "admin123456",
+                "tags": "management,policymaker,monitoring,administrator",
+            }
+        ]
+      }
 ## @param extraSecretsPrependReleaseName Set this flag to true if extraSecrets should be created with <release-name> prepended.
 ##
 extraSecretsPrependReleaseName: false
@@ -505,7 +531,7 @@ extraSecretsPrependReleaseName: false
 
 ## @param replicaCount Number of RabbitMQ replicas to deploy
 ##
-replicaCount: 1
+replicaCount: 2
 ## @param schedulerName Use an alternate scheduler, e.g. "stork".
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
 ##
@@ -1148,7 +1174,7 @@ metrics:
 
   ## Custom PrometheusRule to be defined
   ## The value is evaluated as a template, so, for example, the value can depend on .Release or .Chart
-  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+  ## ref: https://github.com/coreos/prometheus-operator#customresource
   ##
   prometheusRule:
     ## @param metrics.prometheusRule.enabled Set this to true to create prometheusRules for Prometheus operator
